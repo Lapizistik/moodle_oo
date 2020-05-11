@@ -12,7 +12,7 @@ class MoodleOO
 
   # get all known categories
   def categories
-    @conn.api[Category].index.map { |dict|
+    @api[Category].index.map { |dict|
       Category.create_or_update(dict, self)
     }
   end

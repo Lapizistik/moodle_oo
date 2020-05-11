@@ -1,4 +1,5 @@
 require_relative 'obj_dict'
+require_relative 'course_user'
 
 class MoodleOO
 
@@ -8,7 +9,7 @@ class MoodleOO
       if update or !@enrolled_users
         if result = @conn.api[self.class].enrolled_users(id)
           @enrolled_users = result.map { |dict|
-            User.create_or_update(dict, @conn)
+            CourseUser.new(self, dict)
           }
         end
       end
@@ -37,8 +38,8 @@ class MoodleOO
   end
 
   # get all known courses
-  def courses
-    @api[Course].index.map { |dict|
+  def courses(list=@api[Course].index)
+    list.map { |dict|
       Course.create_or_update(dict, self)
     }
   end

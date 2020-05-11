@@ -2,7 +2,7 @@ class MoodleOO
 
   private
   class ObjDict
-    attr_reader :id
+    attr_reader :id, :conn
     def initialize(id, conn, attributes = {})
       @id = id
       @conn = conn
@@ -13,9 +13,9 @@ class MoodleOO
       if dict
         dict['id'] == @id or raise "this is not the right dict!"
       else
-        dict = conn.apis[self.class].show(@id)
+        dict = @conn.api[self.class].show(@id)
       end
-      @attributes = dict
+      @attributes.merge!(dict)
       self
     end
 
@@ -33,7 +33,7 @@ class MoodleOO
 
     def inspect
       "#<#{self.class} " + @attributes.map { |k,v|
-        "#{k}=“#{v}”" }.join(' ') + inspect_more + ">"
+        "#{k}=“#{v.to_s.sub(/[\n\r].*/m,'…')}”" }.join(' ') + inspect_more + ">"
     end
 
     private def inspect_more

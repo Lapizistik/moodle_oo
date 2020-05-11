@@ -1,13 +1,31 @@
 require_relative 'obj_dict'
+require_relative 'course'
 
 class MoodleOO
 
   class User < ObjDict
+
+    def initialize(id, conn, attributes = {})
+      super(id, conn, attributes)
+      if ec = @attributes.delete('enrolledcourses')
+        @enrolled_courses = @conn.courses(ec)
+      end
+    end
+
+    def update(dict=nil)
+      super(dict)
+      if ec = @attributes.delete('enrolledcourses')
+        @enrolled_courses = @conn.courses(ec)
+      end
+    end
     
     def enrolled_courses(update=false)
       if update or !@enrolled_courses
         if result = @conn.api[self.class].enrolled_courses(id)
           @enrolled_courses = result.map { |dict|
+            dict.delete("enrolledusercount")
+            dict.delete("progress")
+            dict['categoryid'] = dict.delete("category") # why?
             Course.create_or_update(dict, @conn)
           }
         end
