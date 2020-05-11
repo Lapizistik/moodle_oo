@@ -1,3 +1,4 @@
+require 'moodle_rb'
 require_relative 'moodle_oo/category'
 require_relative 'moodle_oo/course'
 require_relative 'moodle_oo/user'
