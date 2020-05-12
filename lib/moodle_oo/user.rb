@@ -40,6 +40,13 @@ class MoodleOO
     alias courses enrolled_courses
     alias courses! enrolled_courses!
 
+    def last_time
+      (t = @attributes['lastaccess']) && Time.at(t)
+    end
+    def first_time
+      (t = @attributes['firstaccess']) && Time.at(t)
+    end
+    
     private def inspect_more
       if @enrolled_courses
         " courses: […(#{@enrolled_courses.length})]"
