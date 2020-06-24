@@ -1,3 +1,4 @@
+# coding: utf-8
 require_relative 'obj_dict'
 require_relative 'course_user'
 
@@ -37,6 +38,14 @@ class MoodleOO
     Course.fetch(id_of(obj), self)
   end
 
+  def courses_by_field(key, val)
+    list = @client.post('core_course_get_courses_by_field',
+                        field: key, value: val).last
+    list.map { |dict|
+      Course.create_or_update(dict, self)
+    } 
+  end
+  
   # get all known courses
   def courses(list=@api[Course].index)
     list.map { |dict|

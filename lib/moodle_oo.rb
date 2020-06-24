@@ -3,6 +3,10 @@ require_relative 'moodle_oo/category'
 require_relative 'moodle_oo/course'
 require_relative 'moodle_oo/user'
 
+# TODO: clean this up
+# this is a temporary fix
+require_relative 'moodle_oo/moodle_helpers'
+
 class MoodleOO
   attr_reader :client, :api, :objects
   
