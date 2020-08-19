@@ -16,9 +16,24 @@ class MoodleOO
       end
       @enrolled_users
     end
-
+    
     def enrolled_users!
       enrolled_users(true)
+    end
+
+    # @param users list of users (or user_ids) to enrol
+    # @param role_id role for these
+    # @param params optional parameters: timestart, timeend, suspend
+    def enrol_users(users, role_id, **params)
+      @conn.client.post('enrol_manual_enrol_users',
+                        enrolments: users.map.with_index {|u,i|
+                          [i, {
+                            userid: id_of(u),
+                            roleid: role_id
+                          }.merge(params)]
+                        }.to_h
+                       )
+                            
     end
     
     alias users enrolled_users
@@ -32,6 +47,18 @@ class MoodleOO
       end
     end
   end
+
+  # @param courses a list of hashmaps with course parameters
+  # e.g. #create_courses([{fullname: 'Course Name', shortname: 'Cname',
+  #                        categoryid: 23, …}, {…}, …])
+  # fullname, shortname and categoryid are required, all others optional
+  def create_courses(courses)
+    @client.post(
+      'core_course_create_courses',
+      courses: courses.map.with_index { |c,i| [i,c] }.to_h
+    )
+  end
+
 
   # get the course with the given id
   def course(obj)

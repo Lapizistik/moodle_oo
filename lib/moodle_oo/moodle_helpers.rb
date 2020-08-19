@@ -13,7 +13,7 @@ module MoodleRb
                     )
     end
     # explicit method for debugging
-    def post(function, **param)
+    def post_all(function, **param)
       response = self.class.post('/webservice/rest/server.php',
                                  {
                                    query: query_hash(function, token),
@@ -21,7 +21,12 @@ module MoodleRb
                                  }.merge(query_options)
                                 )
       check_for_errors(response)
-      response.parsed_response.first
+      response.parsed_response
+    end
+
+    # FIXME: bad name
+    def post(function, **param)
+      post_all(function, **param).first
     end
   end
 end
