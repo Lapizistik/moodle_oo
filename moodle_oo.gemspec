@@ -14,5 +14,4 @@ It returns '
   spec.files         = Dir['lib/*.rb'] + Dir['lib/*/*.rb'] +
                        ['README.md', 'LICENSE.txt', 'VERSION', 'Gemfile']
 
-  spec.add_dependency 'moodle_rb'
 end

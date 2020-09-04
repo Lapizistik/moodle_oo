@@ -1,20 +1,19 @@
-class MoodleOO
+module MoodleOO
 
   private
-  class ObjDict
-    attr_reader :id, :conn
-    def initialize(id, conn, attributes = {})
-      @id = id
-      @conn = conn
-      @attributes = attributes
+  class MObject
+    attr_reader :id, :client
+    def initialize(dict, client)
+      @id = dict['id'] or
+        raise "ID missing on #{self.class} data:\n#{mobj.inspect}"
+      @client = client
+      @attributes = dict
+      @client.cache(self)
     end
 
-    def update(dict=nil)
-      if dict
-        dict['id'] == @id or raise "this is not the right dict!"
-      else
-        dict = @conn.api[self.class].show(@id)
-      end
+    def update(dict)
+      dict['id'] == @id or raise "this is not the right dict!"
+
       @attributes.merge!(dict)
       self
     end
@@ -28,7 +27,7 @@ class MoodleOO
     end
 
     def [](key)
-      @attributes[key]
+      @attributes[key.to_s]
     end
 
     def inspect
@@ -36,6 +35,10 @@ class MoodleOO
         "#{k}=“#{v.to_s.sub(/[\n\r].*/m,'…')}”" }.join(' ') + inspect_more + ">"
     end
 
+    def type
+      self.class
+    end
+    
     private def inspect_more
       ''
     end
@@ -59,6 +62,12 @@ class MoodleOO
         else
           nil
         end
+      end
+    end
+
+    class << self
+      def keys
+        [:id]
       end
     end
   end
