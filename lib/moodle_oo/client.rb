@@ -12,12 +12,15 @@ require_relative 'error'
 module MoodleOO
   class Client
     # nil or :terse or :full
-    attr_accessor :debug
-    
-    def initialize(token:, url:, path: PATH)
+    attr_reader :debug
+
+    # OpenSSL::SSL::VERIFY_NONE
+    # OpenSSL::SSL::VERIFY_PEER
+    def initialize(token:, url:, path: PATH, ssl_verify_mode: OpenSSL::SSL::VERIFY_PEER)
       @uri = URI.join(url, path)
       @token = token
       @debug = nil
+      @ssl_verify_mode = ssl_verify_mode
       
       
       @objects = [Category, Course, User].map { |klass|
@@ -38,7 +41,7 @@ module MoodleOO
     end
     
     def course(id)
-      @objects[User][id] || user!(id)
+      @objects[Course][id] || course!(id)
     end
     
     def get_course(id)
@@ -52,16 +55,47 @@ module MoodleOO
         @objects[obj.type][key][obj[key]] = obj
       end
     end
+
+    def post_raw(function, **params)
+      Net::HTTP.Proxy('localhost',5555).post_form(@uri,
+                          {
+                            wstoken: @token,
+                            moodlewsrestformat: 'json',
+                            wsfunction: function
+                          }.merge(flatten_params(params)))
+    end
     
-    def post(function, **params)
+    def post_simple(function, **params)
       log_request(function, **params)
       parse_response(Net::HTTP.post_form(@uri,
                                          {
                                            wstoken: @token,
                                            moodlewsrestformat: 'json',
                                            wsfunction: function
-                                         }.merge(flatten_params(params))))
+                                         }.merge(flatten_params(params))),
+                     function: function, params: params)
     end
+
+    def post_fc(function, **params)
+      log_request(function, **params)
+      response = Net::HTTP.start(@uri.host, @uri.port,
+                                 use_ssl: true,
+                                 verify_mode: @ssl_verify_mode) do |http|
+        http.read_timeout = 60*30
+        request = Net::HTTP::Post.new(@uri.path)
+        request["Content-Type"] = "application/json"
+        request.set_form_data({
+          wstoken: @token,
+          moodlewsrestformat: 'json',
+          wsfunction: function
+        }.merge(flatten_params(params)))
+
+        http.request(request) # Net::HTTPResponse object
+      end
+      parse_response(response, function: function, params: params)
+    end
+
+    alias post post_fc
 
     def flatten_params(params)
 #      puts "processing “#{params.inspect}”"
@@ -94,23 +128,34 @@ module MoodleOO
       end
     end
       
-    def parse_response(response)
-      raise MoodleHTTPError.new(response) unless response.kind_of? Net::HTTPSuccess
+    def parse_response(response, function:, params:)
+      raise MoodleHTTPError.new(response, function: function, params: params) unless response.kind_of? Net::HTTPSuccess
       body = JSON(response.body)
       # Moodle returns all kinds of data structures.
       # On error we get an error object (i.e. hashmap):
-      raise MoodleServerError.new(response) if body.kind_of?(Hash) && body['errorcode']
+      raise MoodleServerError.new(response, function: function, params: params) if body.kind_of?(Hash) && body['errorcode']
       body
     end
   
-    
+    def debug=(type)
+      @debug = type
+      case @debug
+      when :full
+        require 'pp'
+      when true
+        @debug = :terse
+      end
+      @debug
+    end
+
     private
     def log_request(function, **params)
       case @debug
       when :full
-        warn ""
+        warn "POST #{@uri}: #{function}"
+        PP.pp(params, $stderr)
       when :terse
-        warn ""
+        warn "POST #{@uri}: #{function}"
       end
     end
 

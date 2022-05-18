@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
 It returns '
   spec.homepage      = "https://github.com/Lapizistik/moodle_oo"
   spec.license       = "MIT"
-  spec.files         = Dir['lib/*.rb'] + Dir['lib/*/*.rb'] +
+  spec.files         = Dir['lib/**/*.rb'] + 
                        ['README.md', 'LICENSE.txt', 'VERSION', 'Gemfile']
 
 end

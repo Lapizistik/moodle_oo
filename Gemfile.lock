@@ -2,14 +2,10 @@ PATH
   remote: .
   specs:
     moodle_oo (0.1.1)
-      faraday
 
 GEM
   remote: https://rubygems.org/
   specs:
-    faraday (1.0.1)
-      multipart-post (>= 1.2, < 3)
-    multipart-post (2.1.1)
 
 PLATFORMS
   ruby
@@ -18,4 +14,4 @@ DEPENDENCIES
   moodle_oo!
 
 BUNDLED WITH
-   2.0.1
+   2.2.26

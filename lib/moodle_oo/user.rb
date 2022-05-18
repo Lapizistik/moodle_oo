@@ -55,8 +55,16 @@ module MoodleOO
     #   end
     # end
 
-    def update!
-      update(@client.get_user(@id))
+    def [](key)
+      if key == :email
+        @attributes['email']&.downcase
+      else
+        @attributes[key.to_s]
+      end
+    end
+
+    def update_from_server
+      merge(@client.get_user(@id))
     end
 
     class << self
@@ -67,5 +75,3 @@ module MoodleOO
   end
   
 end
-
-  

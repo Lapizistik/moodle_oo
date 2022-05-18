@@ -11,9 +11,9 @@ module MoodleOO
       @client.cache(self)
     end
 
-    def update(dict)
+    # merge user attributes from dict.
+    def merge(dict)
       dict['id'] == @id or raise "this is not the right dict!"
-
       @attributes.merge!(dict)
       self
     end

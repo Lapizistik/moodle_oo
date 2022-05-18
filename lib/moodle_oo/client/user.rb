@@ -4,7 +4,7 @@ module MoodleOO
     
     def user!(id)
       if u = @objects[User][:id][id]
-        u.update!
+        u.update_from_server
       else
         User.new(get_user(id).first, self)
       end
@@ -42,10 +42,12 @@ module MoodleOO
       unknown = values.reject { |v|
         @objects[User][field][v]
       }
-      # fetch these users, so they are in the cache
-      get_users_by(field: field, values: unknown).map { |dict|
-        User.new(dict, self)
-      }
+      unless unknown.empty?
+        # fetch these users, so they are in the cache
+        get_users_by(field: field, values: unknown).map { |dict|
+          User.new(dict, self)
+        }
+      end
       # and now collect all of them
       values.map { |v|
         @objects[User][field][v]

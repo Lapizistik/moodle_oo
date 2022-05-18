@@ -5,9 +5,11 @@ module MoodleOO
   # TODO some useful accessors
   
   class MoodleError < StandardError
-    attr_reader :response
-    def initialize(response)
+    attr_reader :response, :function, :params
+    def initialize(response, function:, params: nil)
       @response = response
+      @function = function
+      @params = params
     end    
   end
   

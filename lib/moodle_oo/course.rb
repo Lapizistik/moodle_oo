@@ -46,6 +46,12 @@ module MoodleOO
   #       ""
   #     end
   #   end
+
+    class << self
+      def keys
+        [:id, :idnumber, :username, :email]
+      end
+    end
   end
 
   # # @param courses a list of hashmaps with course parameters
@@ -82,6 +88,5 @@ module MoodleOO
 
   # def course_users
   #   # TODO
-  # end
-
+  # end 
 end
