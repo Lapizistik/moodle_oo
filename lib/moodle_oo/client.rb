@@ -36,7 +36,7 @@ module MoodleOO
       if c = @objects[Course][id]
         c.update!
       else
-        Course.new(get_course, self)
+        Course.new(get_course(id), self)
       end
     end
     
