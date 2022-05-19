@@ -5,6 +5,7 @@ require_relative 'category'
 require_relative 'course'
 require_relative 'user'
 require_relative 'client/user'
+require_relative 'client/course'
 
 
 require_relative 'error'
@@ -13,6 +14,9 @@ module MoodleOO
   class Client
     # nil or :terse or :full
     attr_reader :debug
+
+    # TODO: needed for create_or_update, refactor
+    attr_reader :objects
 
     # OpenSSL::SSL::VERIFY_NONE
     # OpenSSL::SSL::VERIFY_PEER
@@ -32,22 +36,6 @@ module MoodleOO
       post('core_webservice_get_site_info')
     end
     
-    def course!(id)
-      if c = @objects[Course][id]
-        c.update!
-      else
-        Course.new(get_course(id), self)
-      end
-    end
-    
-    def course(id)
-      @objects[Course][id] || course!(id)
-    end
-    
-    def get_course(id)
-      post('core_course_get_courses', options: { ids: [id] }).first
-    end
-    
     # :nodoc:
     
     def cache(obj)
@@ -55,6 +43,8 @@ module MoodleOO
         @objects[obj.type][key][obj[key]] = obj
       end
     end
+
+    
 
     def post_raw(function, **params)
       Net::HTTP.Proxy('localhost',5555).post_form(@uri,

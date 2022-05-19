@@ -18,6 +18,16 @@ module MoodleOO
       self
     end
 
+    def update(dict=nil)
+      if dict
+        dict['id'] == @id or raise "this is not the right dict!"
+      else
+        dict = @client.api[self.class].show(@id)
+      end
+      @attributes.merge!(dict)
+      self
+    end
+
     def method_missing(key)
       @attributes[key.to_s] 
     end
@@ -50,19 +60,19 @@ module MoodleOO
         if obj
           obj.update(dict)
         else
-          obj = new(id, conn, dict)
+          obj = new(dict, conn)
           conn.objects[self][id] = obj
         end
         obj
       end
 
-      def fetch(id, conn)
-        if dict = conn.api[self].show(id)
-          create_or_update(dict, conn)
-        else
-          nil
-        end
-      end
+#      def fetch(id, conn)
+#        if dict = conn.api[self].show(id)
+#          create_or_update(dict, conn)
+#        else
+#          nil
+#        end
+#      end
     end
 
     class << self

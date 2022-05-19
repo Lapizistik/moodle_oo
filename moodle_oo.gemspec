@@ -6,7 +6,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Klaus Stein"]
   spec.email         = ["apps@istik.de"]
 
-  spec.summary       = 'OO wrapper for moodle_rb'
+  spec.summary       = 'OO access to ugly moodle webAPI'
   spec.description   = 'moodle_rb allows to access the moodle api.
 It returns '
   spec.homepage      = "https://github.com/Lapizistik/moodle_oo"
