@@ -19,11 +19,11 @@ class MoodleOO
       self
     end
 
-    def method_missing(key)
+    def method_missing(key, *args)
       @attributes[key.to_s] 
     end
 
-    def respond_to?(key)
+    def respond_to?(key, include_all=false)
       @attributes.has_key?(key.to_s) || super
     end
 
